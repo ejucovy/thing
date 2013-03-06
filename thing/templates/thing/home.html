@@ -1,0 +1,52 @@
+{% extends "thing/theme.html" %}
+{% load i18n %}
+{% block content %}
+
+<div>
+  <div id="oc-content-main" class="oc-content-main">
+    <div id="oc-home-content" class="oc-boxy">
+      Boxy
+    </div>
+    <div class="oc-home-columnGroup oc-clearAfter">
+      <div class="oc-widget oc-widget-feed oc-home-column">
+	<h2 class="oc-feed-title">
+	  {% blocktrans %}Newest projects{% endblocktrans %}
+	</h2>
+	<ol class="oc-lineup-list">
+	  {% with feed_entry_class="oc-feed-item" %}
+	  {% for feed_entry in newest_projects %}
+	  {% include "thing/snippets/feed_entry.html" %}
+	  {% endfor %}
+	  {% endwith %}
+	</ol>
+      </div>
+      <div class="oc-widget oc-widget-feed oc-home-column">
+	<h2 class="oc-feed-title">
+	  {% blocktrans %}Updated projects{% endblocktrans %}
+	</h2>
+	<ol class="oc-lineup-list">
+	  {% with feed_entry_class="oc-feed-item" %}
+	  {% for feed_entry in updated_projects %}
+	  {% include "thing/snippets/feed_entry.html" %}
+	  {% endfor %}
+	  {% endwith %}
+	</ol>
+      </div>
+    </div>
+  </div>
+  <div id="oc-content-sidebar">
+    <div id="oc-home-news" class="oc-widget oc-widget-feed">
+      <h2 class="oc-feed-title">{% blocktrans %}{{ SITE_NAME }} News{% endblocktrans %}</h2>
+      <ul class="oc-lineup-list">
+	{% for feed_entry in news %}
+	{% include "thing/snippets/feed_entry.html" %}
+	{% endfor %}
+      </ul>
+    </div>
+    <div class="oc-boxy">
+      Sidebar content
+    </div>
+  </div>
+</div>
+
+{% endblock %}

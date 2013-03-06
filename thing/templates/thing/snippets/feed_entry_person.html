@@ -1,0 +1,25 @@
+{% load i18n %}
+	<li class="{{ feed_entry_class }} oc-clearAfter">
+	  {% if feed_entry.image_prefix %}
+	  <div class="oc-avatar">
+	    <a href="{{ feed_entry.get_absolute_url }}">
+	      <img class="{{ feed_entry.image_prefix.html_class }}"
+		   src="{{ feed_entry.image_prefix.image_url }}"
+		   alt="{{ feed_entry.title }}" />
+	    </a>
+	  </div>
+	  {% endif %}
+	  <div class="oc-feed-item-content">
+	    <h3 class="oc-feed-item-title">
+	      <a href="{{ feed_entry.get_absolute_url }}">{{ feed_entry.title }}</a>
+	    </h3>
+	    {% for item_data in feed_entry.item_data %}
+	    <div class="oc-feed-item-data oc-discreetText">
+	      {{ item_data|safe }}
+	    </div>
+	    {% endfor %}
+	    <p class="oc-feed-item-description">
+	      {{ feed_entry.content }}
+	    </p>
+	  </div>
+	</li>

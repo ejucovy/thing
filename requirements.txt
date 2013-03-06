@@ -1,0 +1,7 @@
+Django==1.5
+djangohelpers==0.9
+python-dateutil==2.1
+six==1.2.0
+topp.utils==0.5.1
+wsgiref==0.1.2
+zope.dottedname==4.0.0

@@ -1,0 +1,33 @@
+{% extends "thing/theme.html" %}
+{% load i18n %}
+{% block content %}
+
+<div>
+  <div class="oc-headingBlock">
+    <h1>{% blocktrans %}People on {{ SITE_NAME }}{% endblocktrans %}</h1>
+    <p class="oc-headingContext">{% blocktrans %}{{ NUM_PEOPLE }} members, and growing{% endblocktrans %}</p>
+  </div>
+  <div id="oc-content-main" class="oc-content-main">
+    <div id="oc-home-content" class="oc-boxy oc-widget oc-widget-search oc-widget-multiSearch">
+      Boxy
+    </div>
+    <div class="oc-directory">
+      <h2 class="oc-feed-title">
+	{% blocktrans %}New members{% endblocktrans %}
+      </h2>
+      <br />
+      <ol class="oc-lineup-list">
+	{% with feed_entry_class="oc-lineup-item" %}
+	{% for feed_entry in recent_members %}
+	{% include "thing/snippets/feed_entry_person.html" %}
+	{% endfor %}
+	{% endwith %}
+      </ol>
+    </div>
+  </div>
+
+  <div id="oc-content-sidebar">
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "thing/theme.html" %}
+{% load i18n %}
+{% block content %}
+
+<div>
+  <div class="oc-headingBlock">
+    <h1>{% blocktrans %}Projects on {{ SITE_NAME }}{% endblocktrans %}</h1>
+    <p class="oc-headingContext">{% blocktrans %}Currently serving {{ NUM_PROJECTS }} projects{% endblocktrans %}</p>
+  </div>
+  <div id="oc-content-main" class="oc-content-main">
+    <div id="oc-home-content" class="oc-boxy oc-widget oc-widget-search oc-widget-multiSearch">
+      Boxy
+    </div>
+    <div class="oc-blocklist">
+      <h2 class="oc-feed-title">
+	{% blocktrans %}Recently updated projects{% endblocktrans %}
+      </h2>
+      <ol class="oc-lineup-list">
+	{% with feed_entry_class="oc-lineup-item" %}
+	{% for feed_entry in updated_projects %}
+	{% include "thing/snippets/feed_entry.html" %}
+	{% endfor %}
+	{% endwith %}
+      </ol>
+    </div>
+  </div>
+
+  <div id="oc-content-sidebar">
+    <div class="oc-getstarted">
+      <h2>{% blocktrans %}Get started&hellip;{% endblocktrans %}</h2>
+      <p>{% blocktrans %}Can't find a project you are interested in?  See a need that is not being met?{% endblocktrans %}</p>
+      <a class="oc-banana" href="{% url 'projects_create' %}">{% blocktrans %}Start a new project{% endblocktrans %}</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
