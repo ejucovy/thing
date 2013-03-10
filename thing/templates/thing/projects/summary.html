@@ -1,0 +1,33 @@
+{% extends "thing/theme.html" %}
+{% load i18n %}
+{% block content %}
+
+<div>
+  <div id="oc-content-main">
+    <div class="oc-headingBlock oc-clearAfter">
+      <img style="float: left; width: 80px; margin: 0 1em 0.5em 0; border: 1px solid #EEE;" 
+	   src="{{ project.logo_url }}" />
+      <h1>{{ project.name }}</h1>
+      <p class="oc-headingContext oc-discreetText">
+	{% blocktrans with created=project.created updated=project.updated %}created {{ created }}, last updated {{ updated }}{% endblocktrans %}
+      </p>
+      <p>{{ project.description }}</p>
+    </div>
+    <div class="oc-columnGroup">
+      {% for source in sources %}
+      <div class="oc-widget oc-widget-feed oc-column">
+	<h2 class="oc-feed-title"><a href="{{ source.feed_source }}">{{ source.title }}</a></h2>
+	<ol class="oc-lineup-list">
+	  {% with feed_entry_class="oc-feed-item" %}
+	  {% for feed_entry in source.get_feed %}
+	  {% include "thing/snippets/feed_entry.html" %}
+	  {% endfor %}
+	  {% endwith %}
+	</ol>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
