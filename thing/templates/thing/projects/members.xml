@@ -1,0 +1,8 @@
+<members>
+  {% for member in members %}
+  <member>
+    <id>{{ member }}</id>
+    <role>{{ member.role_token }}</role>
+  </member>
+  {% endfor %}
+</members>

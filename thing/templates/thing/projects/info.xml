@@ -1,0 +1,5 @@
+<info>
+  <policy>{{ project.policy_token }}</policy>
+  <featurelets>
+  </featurelets>
+</info>
