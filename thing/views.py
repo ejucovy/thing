@@ -21,33 +21,15 @@ def as_json(view):
                             content_type="application/json")
     return inner
 
-def get_chrome(request):
-    chrome = {
-        'request': request,
-        'SITE_NAME': settings.SITE_NAME,
-        'SITE_DOMAIN': settings.SITE_DOMAIN,
-        'SITE_BIRTHDATE': settings.SITE_BIRTHDATE,
-        'NUM_PEOPLE': UserProfile.objects.all().count(),
-        'NUM_PROJECTS': Project.objects.all().count(),
-        }
-    if request.user.is_authenticated():
-        chrome.update({
-                'num_user_updates': 0,
-                'user_projects': [membership.project for membership in
-                                  ProjectMember.objects.select_related("project").filter(
-                        user=request.user).order_by("project__name")],
-                })
-    return chrome
-
 @allow_http("GET")
 @rendered_with("thing/theme.html")
 def theme(request):
-    return get_chrome(request)
+    return {}
 
 @allow_http("GET")
 @rendered_with("thing/home.html")
 def home(request):
-    chrome = get_chrome(request)
+    chrome = {}
 
     recently_created_projects = utils.projects_recently_created()
     chrome.update({
@@ -91,7 +73,7 @@ def home(request):
 @allow_http("GET")
 @rendered_with("thing/people.html")
 def people(request):
-    chrome = get_chrome(request)
+    chrome = {}
     chrome.update({
             'recent_members': [
                 utils.FeedEntry(person['url'], person['fullname'], 
@@ -126,7 +108,7 @@ logout = join = login
 @allow_http("GET")
 @rendered_with("thing/projects.html")
 def projects(request):
-    chrome = get_chrome(request)
+    chrome = {}
     chrome.update({
             'updated_projects': [
                 utils.FeedEntry(project['url'], project['name'], 
