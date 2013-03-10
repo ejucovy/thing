@@ -42,6 +42,10 @@ class Project(models.Model):
     def team_url(self):
         return ('projects_project_team', [self.slug])
 
+    @models.permalink
+    def summary_url(self):
+        return ('projects_project_summary', [self.slug])
+
     def logo_url(self):
         if self.logo:
             return self.logo
@@ -73,6 +77,11 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
+    def nav_entries(self):
+        return [
+            (self.summary_url(), _("Summary")),
+            (self.team_url(), _("Team")),
+            ]
 class ProjectFeedSource(models.Model):
     
     class Meta:
@@ -98,6 +107,20 @@ class ProjectFeedSource(models.Model):
             yield FeedEntry(entry.link, entry.title, entry.description, 
                             item_data=[entry.published])
 
+class ProjectNavigationEntry(models.Model):
+
+    class Meta:
+        verbose_name = _('project navigation entry')
+        verbose_name_plural = _('project navigation entries')
+    
+    project = models.ForeignKey(Project, verbose_name=_('project'),
+#                                related_name="nav_entries"
+                                )
+
+    title = models.CharField('title', max_length=255)
+    url = models.CharField('url', max_length=255)
+
+    
 class ProjectTool(models.Model):
     
     class Meta:

@@ -38,19 +38,15 @@
         <div id="oc-topnav" style="padding:0.8em">
 	  
 	  <h1>
-	    <a href="{{ SITE_DOMAIN }}">{{ SITE_NAME }}</a>
+	    <a href="{{ request_context.url }}">{{ request_context.title }}</a>
 	  </h1>
 	  
 	  <ul id="oc-topnav-context" class="oc-clearAfter">
+	    {% for nav_entry in request_context.nav_entries %}
 	    <li>
-	      <a href="{% url 'people' %}">{% blocktrans %}People{% endblocktrans %}</a>
+	      <a href="{{ nav_entry.0 }}">{{ nav_entry.1 }}</a>
 	    </li>
-	    <li>
-	      <a href="{% url 'projects' %}">{% blocktrans %}Projects{% endblocktrans %}</a>
-	    </li>
-	    <li>
-	      <a href="{% url 'projects_create' %}">{% blocktrans %}Start A Project{% endblocktrans %}</a>
-	    </li>
+	    {% endfor %}
 	  </ul>
 
 	  <div id="oc-topnav-tab">
