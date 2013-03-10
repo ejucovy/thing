@@ -187,6 +187,13 @@ def projects_project(request, slug):
                    ).rstrip("/") + "/"
     return redirect(url)
 
+@allow_http("GET")
+@project_view
+@rendered_with("thing/projects/summary.html")
+def projects_project_summary(request, slug):
+    sources = request.project.feed_sources.all()
+    return {'project': request.project, 'sources': sources, 'request': request}
+
 @csrf_exempt
 @allow_http("GET", "POST")
 @project_view

@@ -69,6 +69,25 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
+class ProjectFeedSource(models.Model):
+    
+    class Meta:
+        verbose_name = _('project feed source')
+        verbose_name_plural = _('project feed sources')
+    
+    project = models.ForeignKey(
+        Project, verbose_name=_('project'), related_name="feed_sources")
+    feed_source = models.URLField(_('feed source'), max_length=255, null=True, blank=True)
+    title = models.CharField(_('feed title'), max_length=255)
+
+    def get_feed(self):
+        import feedparser
+        feed = feedparser.parse(self.feed_source)
+        from thing.utils import FeedEntry
+        for entry in feed.entries[:5]:
+            yield FeedEntry(entry.link, entry.title, entry.description, 
+                            item_data=[entry.published])
+
 class ProjectTool(models.Model):
     
     class Meta:
