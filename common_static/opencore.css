@@ -508,7 +508,9 @@ div.oc-blocklist li.oc-lineup-item .oc-feed-item-data.oc-actions {
 
 
 
-
+#oc-feed-team .oc-lineup-list li.oc-feed-item p:first-child {
+  text-align: center;
+}
 
 /* Team View */
 div.oc-roster ol.oc-lineup-list {
