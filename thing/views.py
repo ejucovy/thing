@@ -174,7 +174,13 @@ def projects_project(request, slug):
 @rendered_with("thing/projects/summary.html")
 def projects_project_summary(request, slug):
     sources = request.project.feed_sources.all()
-    return {'project': request.project, 'sources': sources, 'request': request}
+    team = request.project.memberships.select_related(
+        "user", "user__profile", "project").all()
+    num_members = len(team)
+    return {
+        'project': request.project, 'sources': sources, 'request': request,
+        'team': team, 'num_members': num_members,
+        }
 
 @csrf_exempt
 @allow_http("GET", "POST")

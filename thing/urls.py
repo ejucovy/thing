@@ -38,7 +38,8 @@ urlpatterns = patterns(
     url(r'^projects/(?P<slug>[\d\w\-_]+)/summary/$', 'projects_project_summary'),
 
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/contents/$', 'projects_project_contents'),
-    url(r'^projects/(?P<slug>[\d\w\-_]+)/team/$', 'projects_project_team'), #check
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/team/$', 'projects_project_team',
+        name="projects_project_team"), #check
 
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/manage-team/$', 'projects_project_manage_team'),
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/preferences/$', 'projects_project_preferences'),

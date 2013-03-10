@@ -38,6 +38,10 @@ class Project(models.Model):
     def homepage_url(self):
         return ('projects_project', [self.slug])
 
+    @models.permalink
+    def team_url(self):
+        return ('projects_project_team', [self.slug])
+
     def logo_url(self):
         if self.logo:
             return self.logo
@@ -116,6 +120,16 @@ class ProjectMember(models.Model):
                                 related_name='memberships')
     user = models.ForeignKey('auth.User', verbose_name=_('user'),
                              related_name='memberships')
+
+    def homepage_url(self):
+        if self.anonymous:
+            return u""
+        return self.user.profile.homepage_url()
+
+    def logo_url(self):
+        if self.anonymous:
+            return self.project.logo_url()
+        return self.user.profile.logo_url()
 
     ROLE_CHOICES = (
         ('member', _('project role: member')),

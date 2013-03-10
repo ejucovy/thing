@@ -28,6 +28,28 @@
       {% endfor %}
     </div>
   </div>
+  <div id="oc-content-sidebar">
+    <div class="oc-widget oc-widget-feed">
+      <div class="oc-buttons oc-column oc-clearAfter" id="oc-feed-team">
+	<h2 class="oc-feed-title oc-clearAfter">
+	  <a href="{{ project.team_url }}">{% blocktrans %}Team{% endblocktrans %}</a>
+	  {% blocktrans %}{{ num_members }} members{% endblocktrans %}
+	</h2>
+	<ul class="oc-lineup-list oc-clearAfter">
+	  {% for member in team %}
+	  <li class="oc-feed-item oc-clearAfter">
+	    <p>
+	      <a href="{{ member.homepage_url }}"><img src="{{ member.logo_url }}" /></a>
+	      <span class="oc-feed-item-data oc-discreetText">
+		<a href="{{ member.homepage_url }}">{{ member }}</a>
+	      </span>
+	    </p>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
