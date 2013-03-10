@@ -7,7 +7,7 @@ urlpatterns = patterns(
     'thing.views',
 
     url(r'^$', 'home', name="home"),
-    url(r'^theme/$', 'theme', name="theme"),
+    url(r'^theme.html/$', 'theme', name="theme"),
     # @@TODO: xinha config
 
     url(r'^people/$', 'people', name="people"), 
@@ -28,6 +28,13 @@ urlpatterns = patterns(
 
     url(r'^projects/(?P<slug>[\d\w\-_]+)/$', 'projects_project',
         name='projects_project'), # check
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/members.xml$',
+        'projects_project_members_xml',
+        name='projects_project_members_xml'), 
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/info.xml$',
+        'projects_project_info_xml',
+        name='projects_project_info_xml'), 
+
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/summary/$', 'projects_project_summary'),
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/contents/$', 'projects_project_contents'),
     url(r'^projects/(?P<slug>[\d\w\-_]+)/team/$', 'projects_project_team'), #check

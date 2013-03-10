@@ -40,6 +40,7 @@ SITE_NAME = "OpenFSM"
 SITE_DOMAIN = "http://localhost:8000"
 import datetime
 SITE_BIRTHDATE = datetime.date(2012, 5, 1)
+OPENCORE_SECRET_FILENAME = "/Users/ethanjucovy/Code/socialplanning/thing/admin_info"
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -102,6 +103,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'thing.middleware.AuthenticationMiddleware',
 )
 
 ROOT_URLCONF = 'thing.urls'

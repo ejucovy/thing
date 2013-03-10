@@ -24,6 +24,9 @@ class Project(models.Model):
                               choices=POLICY_CHOICES,
                               db_index=True)
 
+    def policy_token(self):
+        return "%s_policy" % self.policy
+
     homepage = models.CharField(_('project homepage'), max_length=30, default='summary')
 
     created = models.DateTimeField(_('project created'), auto_now_add=True)
@@ -101,6 +104,12 @@ class ProjectMember(models.Model):
         )
     role = models.CharField(max_length=25, db_index=True, choices=ROLE_CHOICES)
 
+    def role_token(self):
+        if self.role == "member":
+            return "ProjectMember"
+        if self.role == "admin":
+            return "ProjectAdmin"
+
     anonymous = models.BooleanField(default=False, verbose_name=_('project member anonymous flag'))
     pseudonym = models.CharField(max_length=300, null=True, blank=True, unique=True)
 
@@ -176,3 +185,16 @@ class UserProfile(models.Model):
 
     def render_html(self):
         return mark_safe(u'<a href="%s">%s</a>' % (self.homepage_url(), unicode(self.user)))
+
+from django.conf import settings
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+import libopencore.auth
+def set_cookie(sender, request, user, **kwargs):
+    secret = libopencore.auth.get_secret(settings.OPENCORE_SECRET_FILENAME)
+    val = libopencore.auth.generate_cookie_value(user.username, secret)
+    request.set_cookie("__ac", val)
+user_logged_in.connect(set_cookie)
+
+def unset_cookie(sender, request, user, **kwargs):
+    request.delete_cookie("__ac")
+user_logged_out.connect(unset_cookie)

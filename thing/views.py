@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 from djangohelpers.lib import allow_http, rendered_with
 import json
 from thing.models import Project, UserProfile, ProjectMember
@@ -186,11 +187,28 @@ def projects_project(request, slug):
                    ).rstrip("/") + "/"
     return redirect(url)
 
+@csrf_exempt
+@allow_http("GET", "POST")
+@project_view
+@rendered_with("thing/projects/members.xml", mimetype="application/xml")
+def projects_project_members_xml(request, slug):
+    members = ProjectMember.objects.select_related("user").filter(
+        project=request.project)
+    return {'members': members}
+
+@csrf_exempt
+@allow_http("GET", "POST")
+@project_view
+@rendered_with("thing/projects/info.xml", mimetype="application/xml")
+def projects_project_info_xml(request, slug):
+    return {'project': request.project}
+
 @allow_http("GET")
 @as_json
 @project_view
 def projects_project_team(request, slug):
-    members = ProjectMember.objects.filter(project=request.project)
+    members = ProjectMember.objects.select_related("user").filter(
+        project=request.project)
     return {'members': [unicode(member) for member in members]}
 
 @allow_http("GET")
