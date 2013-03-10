@@ -17,7 +17,13 @@
       {% for source in sources %}
       <div class="oc-widget oc-widget-feed oc-column">
 	<h2 class="oc-feed-title"><a href="{{ source.feed_source }}">{{ source.title }}</a></h2>
-	<ol class="oc-lineup-list">
+	<ol class="oc-lineup-list" 
+	    {% if source.logo_url %}
+	    data-background-image="{{ source.logo_url }}"
+	    style="background-image: url({{ source.logo_url }});
+		   background-size: 20% 64px;
+		   background-position: top right; background-repeat: no-repeat;"
+	    {% endif %}>
 	  {% with feed_entry_class="oc-feed-item" %}
 	  {% for feed_entry in source.get_feed %}
 	  {% include "thing/snippets/feed_entry.html" %}

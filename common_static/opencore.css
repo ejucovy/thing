@@ -1371,6 +1371,11 @@ height: 1em; */
   margin-bottom: 1em;
   padding-bottom: 0.25em;
 }
+.oc-widget-feed ol[data-background-image] > li:first-child div,
+.oc-widget-feed ul[data-background-image] > li:first-child div {
+  width: 80%;
+}
+
 .oc-feed-title {
 	color: #fff;
 	background: #332F2A;
@@ -1404,6 +1409,7 @@ li.oc-feed-item .oc-feed-item-data,
 li.oc-feed-item .oc-feed-item-description {
   margin: 0;
   line-height: normal;
+  overflow-x: auto;
 }
 li.oc-feed-item .oc-feed-item-data.oc-actions {
   text-align: right;

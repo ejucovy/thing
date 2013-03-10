@@ -84,6 +84,12 @@ class ProjectFeedSource(models.Model):
     feed_source = models.URLField(_('feed source'), max_length=255, null=True, blank=True)
     title = models.CharField(_('feed title'), max_length=255)
 
+    def logo_url(self):
+        # @@TODO
+        import random
+        return random.choice(["/static/blog.gif", "/static/mailinglist.gif",
+                              "/static/tasks.gif", "/static/wiki.gif"])
+
     def get_feed(self):
         import feedparser
         feed = feedparser.parse(self.feed_source)
