@@ -1,6 +1,7 @@
 import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
@@ -199,12 +200,33 @@ def projects_project_info_xml(request, slug):
     return {'project': request.project}
 
 @allow_http("GET")
-@as_json
+@rendered_with("thing/projects/team.html")
 @project_view
 def projects_project_team(request, slug):
     members = ProjectMember.objects.select_related("user").filter(
         project=request.project)
-    return {'members': [unicode(member) for member in members]}
+    sort_options = [
+        {"value": "username", "title": _("sorted by user name"), 
+         "selected": request.GET.get("sort_by") == "username"},
+        {"value": "membership_date", "title": _("sorted by membership date"), 
+         "selected": request.GET.get("sort_by") == "membership_date"},
+        {"value": "location", "title": _("sorted by location"), 
+         "selected": request.GET.get("sort_by") == "location"},
+        ]
+    paginator = Paginator(members, 10)
+    page = request.GET.get("page", 1)
+    try:
+        page = int(page)
+    except (TypeError, ValueError):
+        page = 1
+    page = paginator.page(page)
+    return {'members': [unicode(member) for member in members],
+            'num_members': len(members),
+            'sort_options': sort_options,
+            'page_start': page.start_index(),
+            'page_end': page.end_index(),
+            'page': page,
+            }
 
 @allow_http("GET")
 @as_json

@@ -152,13 +152,25 @@ class ProjectMember(models.Model):
 
     def homepage_url(self):
         if self.anonymous:
-            return u""
+            return self.project.homepage_url()
         return self.user.profile.homepage_url()
 
     def logo_url(self):
         if self.anonymous:
             return self.project.logo_url()
         return self.user.profile.logo_url()
+
+    @property
+    def location(self):
+        if self.anonymous:
+            return None
+        return self.user.profile.location
+
+    @property
+    def projects(self):
+        if self.anonymous:
+            return [self.project]
+        return self.user.profile.projects()
 
     ROLE_CHOICES = (
         ('member', _('project role: member')),
@@ -205,6 +217,7 @@ class UserProfile(models.Model):
         self._projects = [{
                 'name': membership.project.name,
                 'url': membership.project.homepage_url(),
+                'homepage_url': membership.project.homepage_url(),
                 } for membership in memberships]
         return self._projects
 
