@@ -1,7 +1,7 @@
 import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
@@ -203,8 +203,9 @@ def projects_project_info_xml(request, slug):
 @rendered_with("thing/projects/team.html")
 @project_view
 def projects_project_team(request, slug):
-    members = ProjectMember.objects.select_related("user").filter(
-        project=request.project)
+    members = ProjectMember.objects.select_related(
+        "user", "user__profile", "project").filter(
+        project=request.project).exclude(anonymous=True)
     sort_options = [
         {"value": "username", "title": _("sorted by user name"), 
          "selected": request.GET.get("sort_by") == "username"},
@@ -213,13 +214,27 @@ def projects_project_team(request, slug):
         {"value": "location", "title": _("sorted by location"), 
          "selected": request.GET.get("sort_by") == "location"},
         ]
+    ## @@TODO: clean this up
+    if sort_options[0]['selected']:
+        members = members.order_by("user__username")
+    elif sort_options[1]['selected']:
+        members = members.order_by("-created")
+    elif sort_options[2]['selected']:
+        members = members.order_by("user__profile__location")
+
     paginator = Paginator(members, 10)
     page = request.GET.get("page", 1)
     try:
         page = int(page)
-    except (TypeError, ValueError):
-        page = 1
-    page = paginator.page(page)
+        page = paginator.page(page)
+    except (TypeError, ValueError, EmptyPage):
+        # @@TODO: utility function
+        resp = redirect(".") 
+        qs = request.GET.copy()
+        qs['page'] = 1
+        resp['Location'] += "?" + qs.urlencode()
+        return resp
+
     return {'members': [unicode(member) for member in members],
             'num_members': len(members),
             'sort_options': sort_options,
