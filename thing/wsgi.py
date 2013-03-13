@@ -35,6 +35,16 @@ from webob import Request, Response
 import json
 
 from libopencore.deliverance_middleware import filter_factory as Deliverance
+from lxml.etree import fromstring
+from deliverance.ruleset import RuleSet
+from deliverance.middleware import FileRuleGetter
+
+class TemplateRuleGetter(object):
+    def __init__(self, rules, *args, **kw):
+        self.rules = rules
+
+    def __call__(self, get_resource, app, orig_req):
+        return RuleSet.parse_xml(fromstring(self.rules), '')
 
 deliverance = Deliverance({})
 
@@ -50,7 +60,7 @@ def middleware(environ, start_response):
 
     environ.pop("HTTP_ACCEPT_ENCODING", None)
 
-    environ['SCRIPT_NAME'] = str(data['script_name'])
+    environ['SCRIPT_NAME'] = str(data['script_name']).rstrip("/")
     environ['PATH_INFO'] = "/" + str(data['path_info'].lstrip("/") )
 
     environ['HTTP_X_THING_THEME'] = data['theme']
@@ -60,8 +70,14 @@ def middleware(environ, start_response):
     def per_project_theme(environ):
         return "%(wsgi.url_scheme)s://%(HTTP_HOST)s%(HTTP_X_THING_THEME)s" % environ
     filter.default_theme = per_project_theme
-    return filter(environ, start_response)
+    filter.rule_getter = TemplateRuleGetter(data['deliverance_rules'])
+    
+    rq= Request(environ)
+    resp = rq.get_response(filter)
 
+    print rq.url
+
+    return resp(environ, start_response)
     return Response("Hey there!")(environ, start_response)
     
 application = middleware

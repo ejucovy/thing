@@ -91,17 +91,36 @@ class Project(models.Model):
         return nav
 
     def dispatch(self, path_info):
-        path_info = path_info.strip("/")
-        if '/' in path_info:
+        """
+        @@TODO unit test this!
+
+        need to handle:
+
+        /trac/first-env/
+        /trac/first-env/query
+        /trac/first-env/query/
+
+        /blog/
+        /blog/2010/07/25/opencore-0181-released/
+
+        /project-home
+        /project-home/
+
+        /wikis/second-wiki/wiki-home
+        
+        Also how to handle proxying to a downstream site whose root 
+        lives exclusively at "/" (not /index.php)?
+        """
+        path_info = path_info.lstrip("/")
+        if '/' in path_info.strip("/"):
             app, path_info = path_info.split("/", 1)
         else:
             app = '/'
-        path_info = path_info.strip("/")
-        if '/' in path_info:
+        path_info = path_info.lstrip("/")
+        if '/' in path_info.strip("/"):
             env, path_info = path_info.split("/", 1)
         else:
-            env = path_info; 
-            path_info = '/'
+            env = '/'
         try:
             return ProjectTool.objects.get(project=self, app=app, env=env).bound(path_info)
         except ProjectTool.DoesNotExist:
@@ -183,6 +202,35 @@ class ProjectTool(models.Model):
     env = models.CharField(_('app env'), max_length=20)
 
     homepage = models.CharField(_('app homepage'), max_length=50)
+
+    #title = models.CharField(_('app title'), max_length=30)
+    
+    @property
+    def deliverance_rules(self):
+        if self.id == 1:
+            return """
+<ruleset>
+  <rule class="default">
+    <replace theme="children://div[@id='oc-content-container']"
+             content="//div[@id='wrapper']"
+             collapse-sources="1"
+             />
+  </rule>
+
+</ruleset>
+"""
+            
+        return """
+<ruleset>
+  <rule class="default">
+    <replace theme="children://div[@id='oc-content-container']"
+             content="//div[@id='main']"
+             collapse-sources="1"
+             />
+  </rule>
+
+</ruleset>
+"""
 
     url = models.CharField(_('app url'), max_length=200)
 

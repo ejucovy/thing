@@ -198,6 +198,7 @@ def projects_project_dispatch(request, slug, path_info):
                 "script_name": tool.script_name,
                 "path_info": tool.path_info,
                 "theme": request.project.theme_url(),
+                "deliverance_rules": tool.deliverance_rules,
                 "project": request.project.to_json(),
                 "user": request.user.username,
                 }, default=dthandler), status=305)
