@@ -87,7 +87,7 @@ class Project(models.Model):
             (self.team_url(), _("Team")),
             ]
         for tool in self.tools.all():
-            nav.append((tool.relative_path(), tool.id))
+            nav.append((tool.relative_path(), _(tool.title)))
         return nav
 
     def dispatch(self, path_info):
@@ -205,34 +205,9 @@ class ProjectTool(models.Model):
 
     homepage = models.CharField(_('app homepage'), max_length=50)
 
-    #title = models.CharField(_('app title'), max_length=30)
+    title = models.CharField(_('app title'), max_length=30)
     
-    @property
-    def deliverance_rules(self):
-        if self.id == 1:
-            return """
-<ruleset>
-  <rule class="default">
-    <replace theme="children://div[@id='oc-content-container']"
-             content="//div[@id='wrapper']"
-             collapse-sources="1"
-             />
-  </rule>
-
-</ruleset>
-"""
-            
-        return """
-<ruleset>
-  <rule class="default">
-    <replace theme="children://div[@id='oc-content-container']"
-             content="//div[@id='main']"
-             collapse-sources="1"
-             />
-  </rule>
-
-</ruleset>
-"""
+    deliverance_rules = models.TextField(_('app deliverance rules'))
 
     url = models.CharField(_('app url'), max_length=200)
 
