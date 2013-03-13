@@ -72,7 +72,7 @@ def middleware(environ, start_response):
     filter.default_theme = per_project_theme
     filter.rule_getter = TemplateRuleGetter(data['deliverance_rules'])
     
-    rq= Request(environ)
+    rq = Request(environ)
     resp = rq.get_response(filter)
 
     return resp(environ, start_response)

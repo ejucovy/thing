@@ -107,7 +107,9 @@ class Project(models.Model):
         /project-home/
 
         /wikis/second-wiki/wiki-home
-        
+
+        /dotnyc/
+
         Also how to handle proxying to a downstream site whose root 
         lives exclusively at "/" (not /index.php)?
         """
