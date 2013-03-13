@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from djangohelpers.lib import allow_http, rendered_with
+import grequests
 import json
 from thing.models import Project, UserProfile, ProjectMember
 from thing import utils
@@ -127,8 +128,9 @@ def projects(request):
     return chrome
 
 @allow_http("GET")
+@rendered_with("thing/projects_create.html")
 def projects_create(request):
-    return HttpResponse("OK")
+    return {}
 
 @allow_http("GET")
 @as_json
@@ -170,11 +172,48 @@ def projects_project(request, slug):
                    ).rstrip("/") + "/"
     return redirect(url)
 
+from libopencore.deliverance_middleware import CustomDeliveranceMiddleware
+
+class UseProxy(Exception):
+    def __init__(self, base_url, path_info):
+        self.base_url = base_url
+        self.path_info = path_info
+
+@project_view
+def projects_project_dispatch(request, slug, path_info):
+    tool = request.project.dispatch(path_info)
+    if tool is None:
+        return HttpResponse("404") # @@todo
+
+    chrome = theme(request)
+    chrome.render()
+    
+    return HttpResponse(json.dumps({
+                "base_url": tool.url,
+                "script_name": tool.script_name,
+                "path_info": tool.path_info,
+                "theme": chrome.rendered_content,
+                "project": request.project.to_json(),
+                "user": request.user.username,
+                }, default=dthandler), status=305)
+
 @allow_http("GET")
 @project_view
 @rendered_with("thing/projects/summary.html")
 def projects_project_summary(request, slug):
     sources = request.project.feed_sources.all()
+    
+    source_data = [
+        source.feed_source for source in sources
+        if source.cache_expired()
+        ]
+    source_data = (grequests.get(u) for u in source_data)
+    results = grequests.map(source_data)
+
+    for source, result in zip(sources, results):
+        source.bind_data(result.text)
+        source.save()
+
     team = request.project.memberships.select_related(
         "user", "user__profile", "project").all()
     num_members = len(team)

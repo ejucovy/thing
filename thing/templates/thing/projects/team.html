@@ -1,0 +1,96 @@
+{% extends "thing/theme.html" %}
+{% load i18n %}
+{% block content %}
+
+<div>
+  <div id="oc-content-main">
+    <div class="oc-headingBlock">
+      <h1>{% blocktrans %}Team members{% endblocktrans %}</h1>
+      <p class="oc-headingContext">
+	{% blocktrans %}{{ num_members }} members.{% endblocktrans %}
+      </p>
+    </div>
+    <div class="oc-roster">
+      <div class="oc-lineup-sorter">
+	{% blocktrans %}Results {{ page_start }} &ndash; {{ page_end }} of {{ num_members }}{% endblocktrans %}
+	<form name="searchresults_sorting">
+	  <select name="sort_by" class="oc-js-autoSelect">
+	    {% for sort_option in sort_options %}
+	    <option value="{{ sort_option.value }}" 
+		    {% if sort_option.selected %}selected="selected"{% endif %}>
+	      {{ sort_option.title }}
+	    </option>
+	    {% endfor %}
+	  </select>
+	  <button type="submit" class="oc-button oc-chooseThis" 
+		  style="display: none;">{% blocktrans %}sort{% endblocktrans %}
+	  </button>
+	</form>
+      </div>
+
+      <ol class="oc-lineup-list">
+	{% for member in page.object_list %}
+	<li class="oc-lineup-item oc-clearAfter">
+	  <div class="oc-avatar">
+	    <a href="{{ member.homepage_url }}">
+	      <img class="photo" src="{{ member.logo_url }}" />
+	    </a>
+	  </div>
+	  <div class="oc-lineup-content">
+	    <div class="oc-headingBlock">
+	      <h3>
+		<a class="fn nickname" href="{{ member.homepage_url }}">{{ member }}</a>
+	      </h3>
+	      <p class="oc-headingContext oc-discreetText">
+		{% blocktrans with member_since=member.created %}Team member since {{ member_since }}{% endblocktrans %}
+	      </p>
+	    </div>
+	    <dl class="oc-plainList">
+	      {% if member.location %}
+	      <dt>{% blocktrans %}Location:{% endblocktrans %}</dt>
+	      <dd class="adr"><span class="locality">{{ member.location }}</span></dd>
+	      {% endif %}
+	      <dt class="oc-roster-projects">
+		{% blocktrans with member.projects|length as num_projects %}Projects ({{ num_projects }}):{% endblocktrans %}
+	      </dt>
+	      <dd>
+		<ul class="oc-inlineList">
+		  {% for project in member.projects %}
+		  <li>
+		    <a href="{{ project.homepage_url }}">
+		      {{ project.name }}
+		    </a>
+		  </li>
+		  {% endfor %}
+		</ul>
+	      </dd>
+	    </dl>
+	  </div>
+	</li>
+	{% endfor %}
+      </ol>
+      
+      <div class="oc-lineup-sorter">
+	{% blocktrans %}Results {{ page_start }} &ndash; {{ page_end }} of {{ num_members }}{% endblocktrans %}
+	<form name="searchresults_sorting">
+	  <select name="sort_by" class="oc-js-autoSelect">
+	    {% for sort_option in sort_options %}
+	    <option value="{{ sort_option.value }}" 
+		    {% if sort_option.selected %}selected="selected"{% endif %}>
+	      {{ sort_option.title }}
+	    </option>
+	    {% endfor %}
+	  </select>
+	  <button type="submit" class="oc-button oc-chooseThis" 
+		  style="display: none;">{% blocktrans %}sort{% endblocktrans %}
+	  </button>
+	</form>
+      </div>
+    </div>
+    
+  </div>
+  <div id="oc-content-sidebar">
+  </div>
+</div>
+
+{% endblock %}

@@ -28,6 +28,7 @@ urlpatterns = patterns(
 
     url(r'^projects/(?P<slug>[\d\w\-_]+)/$', 'projects_project',
         name='projects_project'), # check
+
     url(r'^projects/(?P<slug>[\d\w\-_]+)/members.xml$',
         'projects_project_members_xml',
         name='projects_project_members_xml'), 
@@ -51,6 +52,9 @@ urlpatterns = patterns(
 
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/request-membership/$', 'projects_project_request_membership'),
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/invite/$', 'projects_project_invite'),
+
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/(?P<path_info>.*)$',
+        'projects_project_dispatch'),
 
 #    url(r'^search/$', 'search'),
 #    url(r'^search/people/$', 'search_people'),

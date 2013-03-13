@@ -25,8 +25,33 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "thing.settings")
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
+django = get_wsgi_application()
 
-# Apply WSGI middleware here.
-# from helloworld.wsgi import HelloWorldApplication
-# application = HelloWorldApplication(application)
+from libopencore.http_proxy import RemoteProxy
+
+#deliverance = get_deliverance_application()
+
+from webob import Request, Response
+import json
+
+from libopencore.deliverance_middleware import filter_factory as deliverance
+
+def middleware(environ, start_response):
+    request = Request(environ.copy())
+    response = request.get_response(django)
+
+    if response.status_int != 305:
+        return response(environ, start_response)
+    data = json.loads(response.body)
+
+    proxy = RemoteProxy([data['base_url']], rewrite_links=True)
+
+    environ.pop("HTTP_ACCEPT_ENCODING", None)
+
+    environ['SCRIPT_NAME'] = str(data['script_name'])
+    environ['PATH_INFO'] = "/" + str(data['path_info'].lstrip("/") )
+    return deliverance({})(proxy)(environ, start_response)
+
+    return Response("Hey there!")(environ, start_response)
+    
+application = middleware

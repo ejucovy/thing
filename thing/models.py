@@ -82,6 +82,24 @@ class Project(models.Model):
             (self.summary_url(), _("Summary")),
             (self.team_url(), _("Team")),
             ]
+
+    def dispatch(self, path_info):
+        path_info = path_info.strip("/")
+        if '/' in path_info:
+            app, path_info = path_info.split("/", 1)
+        else:
+            app = '/'
+        path_info = path_info.strip("/")
+        if '/' in path_info:
+            env, path_info = path_info.split("/", 1)
+        else:
+            env = path_info; 
+            path_info = '/'
+        try:
+            return ProjectTool.objects.get(project=self, app=app, env=env).bound(path_info)
+        except ProjectTool.DoesNotExist:
+            return None
+
 class ProjectFeedSource(models.Model):
     
     class Meta:
@@ -93,18 +111,41 @@ class ProjectFeedSource(models.Model):
     feed_source = models.URLField(_('feed source'), max_length=255, null=True, blank=True)
     title = models.CharField(_('feed title'), max_length=255)
 
+    feed_data_cache = models.TextField(null=True, blank=True)
+    feed_data_cached_on = models.DateTimeField(null=True, blank=True)
+
     def logo_url(self):
         # @@TODO
         import random
         return random.choice(["/static/blog.gif", "/static/mailinglist.gif",
                               "/static/tasks.gif", "/static/wiki.gif"])
 
+    def bind_data(self, feed_data):
+        from django.utils import timezone
+        self.feed_data_cache = feed_data
+        self.feed_data_cached_on = timezone.now()
+
+    def cache_expired(self):
+        import datetime
+        from django.utils import timezone
+        if not self.feed_data_cache:
+            return True
+        if not self.feed_data_cached_on:
+            return True
+        if self.feed_data_cached_on < timezone.now() - datetime.timedelta(1):
+            return True
+        return False
+
     def get_feed(self):
         import feedparser
-        feed = feedparser.parse(self.feed_source)
+        feed = feedparser.parse(self.feed_data_cache or self.feed_source)
         from thing.utils import FeedEntry
         for entry in feed.entries[:5]:
-            yield FeedEntry(entry.link, entry.title, entry.description, 
+            try:
+                description = entry.description
+            except AttributeError:
+                description = ''
+            yield FeedEntry(entry.link, entry.title, description, 
                             item_data=[entry.published])
 
 class ProjectNavigationEntry(models.Model):
@@ -126,17 +167,20 @@ class ProjectTool(models.Model):
     class Meta:
         verbose_name = _('project tool')
         verbose_name_plural = _('project tools')
-        unique_together = [('project', 'tool')]
+        unique_together = [('project', 'app', 'env')]
     
     project = models.ForeignKey(Project, verbose_name=_('project'))
 
-    TOOL_CHOICES = (
-        ('blogs', _('blog tool')),
-        ('wikis', _('wiki tool')),
-        ('tasks', _('task tracker tool')),
-        ('lists', _('mailing list tool')),
-        )
-    tool = models.CharField(_('tool'), max_length=10, choices=TOOL_CHOICES)
+    app = models.CharField(_('app path'), max_length=20)
+    env = models.CharField(_('app env'), max_length=20)
+
+    url = models.CharField(_('app url'), max_length=200)
+
+    def bound(self, path_info):
+        self.script_name = self.project.homepage_url().rstrip("/") + "/%s/%s/" % (
+            self.app.strip("/"), self.env.strip("/"))
+        self.path_info = path_info
+        return self
 
 class ProjectMember(models.Model):
     
