@@ -75,9 +75,6 @@ def middleware(environ, start_response):
     rq= Request(environ)
     resp = rq.get_response(filter)
 
-    print rq.url
-
     return resp(environ, start_response)
-    return Response("Hey there!")(environ, start_response)
     
 application = middleware
