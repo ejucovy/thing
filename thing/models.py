@@ -46,6 +46,10 @@ class Project(models.Model):
     def summary_url(self):
         return ('projects_project_summary', [self.slug])
 
+    @models.permalink
+    def theme_url(self):
+        return ('projects_project_theme', [self.slug])
+
     def logo_url(self):
         if self.logo:
             return self.logo
@@ -78,10 +82,13 @@ class Project(models.Model):
         return self.name
 
     def nav_entries(self):
-        return [
+        nav = [
             (self.summary_url(), _("Summary")),
             (self.team_url(), _("Team")),
             ]
+        for tool in self.tools.all():
+            nav.append((tool.relative_path(), tool.id))
+        return nav
 
     def dispatch(self, path_info):
         path_info = path_info.strip("/")
@@ -169,10 +176,13 @@ class ProjectTool(models.Model):
         verbose_name_plural = _('project tools')
         unique_together = [('project', 'app', 'env')]
     
-    project = models.ForeignKey(Project, verbose_name=_('project'))
+    project = models.ForeignKey(Project, verbose_name=_('project'),
+                                related_name="tools")
 
     app = models.CharField(_('app path'), max_length=20)
     env = models.CharField(_('app env'), max_length=20)
+
+    homepage = models.CharField(_('app homepage'), max_length=50)
 
     url = models.CharField(_('app url'), max_length=200)
 
@@ -181,6 +191,12 @@ class ProjectTool(models.Model):
             self.app.strip("/"), self.env.strip("/"))
         self.path_info = path_info
         return self
+
+    def relative_path(self):
+        path = "/".join((
+                self.app.strip("/"), self.env.strip("/"), self.homepage.strip("/")))
+        return "%s%s" % (self.project.homepage_url(),
+                         path.strip("/"))
 
 class ProjectMember(models.Model):
     

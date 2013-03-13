@@ -35,6 +35,8 @@ urlpatterns = patterns(
     url(r'^projects/(?P<slug>[\d\w\-_]+)/info.xml$',
         'projects_project_info_xml',
         name='projects_project_info_xml'), 
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/theme/$', 'projects_project_theme',
+        name="projects_project_theme"), #check
 
     url(r'^projects/(?P<slug>[\d\w\-_]+)/summary/$', 'projects_project_summary',
         name="projects_project_summary"),

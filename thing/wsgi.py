@@ -34,7 +34,9 @@ from libopencore.http_proxy import RemoteProxy
 from webob import Request, Response
 import json
 
-from libopencore.deliverance_middleware import filter_factory as deliverance
+from libopencore.deliverance_middleware import filter_factory as Deliverance
+
+deliverance = Deliverance({})
 
 def middleware(environ, start_response):
     request = Request(environ.copy())
@@ -50,7 +52,15 @@ def middleware(environ, start_response):
 
     environ['SCRIPT_NAME'] = str(data['script_name'])
     environ['PATH_INFO'] = "/" + str(data['path_info'].lstrip("/") )
-    return deliverance({})(proxy)(environ, start_response)
+
+    environ['HTTP_X_THING_THEME'] = data['theme']
+
+    filter = deliverance(proxy)
+
+    def per_project_theme(environ):
+        return "%(wsgi.url_scheme)s://%(HTTP_HOST)s%(HTTP_X_THING_THEME)s" % environ
+    filter.default_theme = per_project_theme
+    return filter(environ, start_response)
 
     return Response("Hey there!")(environ, start_response)
     

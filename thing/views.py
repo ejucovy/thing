@@ -172,6 +172,11 @@ def projects_project(request, slug):
                    ).rstrip("/") + "/"
     return redirect(url)
 
+@allow_http("GET")
+@project_view
+def projects_project_theme(request, slug):
+    return theme(request)
+
 from libopencore.deliverance_middleware import CustomDeliveranceMiddleware
 
 class UseProxy(Exception):
@@ -192,7 +197,7 @@ def projects_project_dispatch(request, slug, path_info):
                 "base_url": tool.url,
                 "script_name": tool.script_name,
                 "path_info": tool.path_info,
-                "theme": chrome.rendered_content,
+                "theme": request.project.theme_url(),
                 "project": request.project.to_json(),
                 "user": request.user.username,
                 }, default=dthandler), status=305)
