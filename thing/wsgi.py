@@ -49,7 +49,8 @@ class TemplateRuleGetter(object):
 deliverance = Deliverance({})
 
 def middleware(environ, start_response):
-    request = Request(environ.copy())
+    request = Request(environ).copy()
+
     response = request.get_response(django)
 
     if response.status_int != 305:
@@ -71,7 +72,8 @@ def middleware(environ, start_response):
         return "%(wsgi.url_scheme)s://%(HTTP_HOST)s%(HTTP_X_THING_THEME)s" % environ
     filter.default_theme = per_project_theme
     filter.rule_getter = TemplateRuleGetter(data['deliverance_rules'])
-    
+    filter.use_internal_subrequest = lambda *args, **kw: False
+
     rq = Request(environ)
     resp = rq.get_response(filter)
 

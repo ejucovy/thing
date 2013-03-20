@@ -184,14 +184,12 @@ class UseProxy(Exception):
         self.base_url = base_url
         self.path_info = path_info
 
+@csrf_exempt
 @project_view
 def projects_project_dispatch(request, slug, path_info):
     tool = request.project.dispatch(path_info)
     if tool is None:
         return HttpResponse("404") # @@todo
-
-    chrome = theme(request)
-    chrome.render()
     
     return HttpResponse(json.dumps({
                 "base_url": tool.url,

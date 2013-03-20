@@ -105,6 +105,8 @@ class Project(models.Model):
 
         /project-home
         /project-home/
+        /project-home/edit/
+        /project-home/history
 
         /wikis/second-wiki/wiki-home
 
@@ -126,7 +128,10 @@ class Project(models.Model):
         try:
             return ProjectTool.objects.get(project=self, app=app, env=env).bound(path_info)
         except ProjectTool.DoesNotExist:
-            return None
+            try:
+                return ProjectTool.objects.get(project=self, app=app, env=path_info.strip("/")).bound("/")
+            except ProjectTool.DoesNotExist:
+                return None
 
 class ProjectFeedSource(models.Model):
     
