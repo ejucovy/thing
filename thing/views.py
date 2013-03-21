@@ -199,6 +199,11 @@ def projects_project_dispatch(request, slug, path_info):
                 "deliverance_rules": tool.deliverance_rules,
                 "project": request.project.to_json(),
                 "user": request.user.username,
+                "cookie_blacklist": [
+                    "__ac",
+                    settings.SESSION_COOKIE_NAME,
+                    settings.CSRF_COOKIE_NAME,
+                    ],
                 }, default=dthandler), status=305)
 
 @allow_http("GET")

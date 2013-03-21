@@ -59,12 +59,24 @@ def middleware(environ, start_response):
 
     proxy = RemoteProxy([data['base_url']], rewrite_links=True, rewrite_cookies=True)
 
-    environ.pop("HTTP_ACCEPT_ENCODING", None)
+    request.environ.pop("HTTP_ACCEPT_ENCODING", None)
 
-    environ['SCRIPT_NAME'] = str(data['script_name']).rstrip("/")
-    environ['PATH_INFO'] = "/" + str(data['path_info'].lstrip("/") )
+    request.environ['SCRIPT_NAME'] = str(data['script_name']).rstrip("/")
+    request.environ['PATH_INFO'] = "/" + str(data['path_info'].lstrip("/") )
 
-    environ['HTTP_X_THING_THEME'] = data['theme']
+    from Cookie import SimpleCookie as Cookie
+    orig_cookie = cookie = request.environ.get('HTTP_COOKIE')
+    if cookie:
+        cookie = Cookie(cookie)
+        for key in data['cookie_blacklist']:
+            cookie.pop(key, None)
+        cookiestr = []
+        for key, value in cookie.items():
+            cookiestr.append(value.OutputString())
+        cookiestr = "; ".join(cookiestr)
+        request.environ['HTTP_COOKIE'] = cookiestr
+
+    request.environ['HTTP_X_THING_THEME'] = data['theme']
 
     filter = deliverance(proxy)
 
@@ -74,9 +86,16 @@ def middleware(environ, start_response):
     filter.rule_getter = TemplateRuleGetter(data['deliverance_rules'])
     filter.use_internal_subrequest = lambda *args, **kw: False
 
-    rq = Request(environ)
-    resp = rq.get_response(filter)
+    base_subrequest = filter.build_external_subrequest
+    def build_external_subrequest(url, orig_req, log):
+        subreq = base_subrequest(url, orig_req, log)
+        if url.endswith("/theme/") and orig_cookie:
+            subreq.environ['HTTP_COOKIE'] = orig_cookie
+        return subreq
+    filter.build_external_subrequest = build_external_subrequest
 
-    return resp(environ, start_response)
+    resp = request.get_response(filter)
+
+    return resp(request.environ, start_response)
     
 application = middleware
