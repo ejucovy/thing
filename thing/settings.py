@@ -9,6 +9,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -103,11 +105,18 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+
+    'django.middleware.transaction.TransactionMiddleware',
+
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
+    'registration_workflow.middleware.CatchInactiveUsersMiddleware',
+    
     'thing.middleware.AuthenticationMiddleware',
 )
+
+INACTIVE_PATHS = ('/accounts/', '/static/')
 
 ROOT_URLCONF = 'thing.urls'
 
@@ -139,8 +148,15 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
+    'registration',
+    #'inactive_user_workflow',
+
+    'contact_manager',
+    'registration_workflow',
     'thing',
 )
+ACCOUNT_ACTIVATION_DAYS = 7
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

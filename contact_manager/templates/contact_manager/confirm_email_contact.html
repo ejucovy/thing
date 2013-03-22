@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Your Account</h1>
+
+To confirm the addition of this contact ({{ contact.email }}) to your existing account 
+({{ contact.user }}) please confirm your identity by retyping your password:
+<form method="POST">
+  {% csrf_token %}
+  <input type="hidden" name="username" value="{{ contact.user.username }}" />
+  <input type="password" name="password" />
+  <input type="submit" value="Confirm Contact" />
+</form>
+{% endblock %}

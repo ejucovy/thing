@@ -63,11 +63,42 @@ urlpatterns = patterns(
 #    url(r'^search/people/location/$', 'search_people_location'),
 #    url(r'^search/projects/$', 'search_projects'),
     url(r'^search/everything$', 'search_everything', name="search_everything"),
+    )
 
-    url(r'^login/$', 'login', name="login"),
-    url(r'^logout/$', 'logout', name="logout"),
-    url(r'^join/$', 'join', name="join"),
+from django.contrib.auth import views as auth_views
+
+urlpatterns += patterns(
+    '',
+
+    url(r'^login/$',
+        auth_views.login,
+        {'template_name': 'registration/login.html'},
+        name='login'),
+    url(r'^logout/$',
+        auth_views.logout,
+        {'template_name': 'registration/logout.html'},
+        name='logout'),
+    url(r'^join/$',
+        'registration_workflow.views.register',
+        name='join'),
+
 #    url(r'^forgot/$', 'forgot'),
 
+    (r'^accounts/contact/', include('contact_manager.urls')),
+    (r'^accounts/', include('registration_workflow.urls')),
+    
+    #url(r'^accounts/resend-confirmation/$',
+    #    'inactive_user_workflow.views.resend_confirmation_email',
+    #    name='resend-user-confirmation'),
+    #url(r'^accounts/login/$',
+    #    'inactive_user_workflow.views.login.login',
+    #    {'template_name': 'registration/login.html'},
+    #    name='auth_login'),
+
+
+
+    
     url(r'^admin/', include(admin.site.urls)),
     )
+
+
