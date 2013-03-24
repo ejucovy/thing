@@ -1,0 +1,123 @@
+{% extends "thing/theme.html" %}
+{% load i18n %}
+{% block content %}
+<div>
+  <div id="oc-content-main">
+
+    <form class="oc-boxy" name="login_form" method="POST" 
+	  id="oc-login-form" action="{% url 'login' %}">
+      {% csrf_token %}
+      <fieldset>
+	<h1>{% blocktrans %}Sign in{% endblocktrans %}</h1> 
+	<table class="oc-form">
+          <tbody>
+            <tr>
+              <th class="oc-form-label" scope="row">
+		<label for="username">
+		  {% blocktrans %}Username{% endblocktrans %}
+		</label>
+	      </th>
+              <td class="oc-form-value">
+                <input type="text" size="15" tabindex="0" name="username"
+		       id="username">
+              </td>
+              <td class="oc-form-help">
+		<span class="oc-form-context"></span>
+		<span id="oc-validator-username" class="oc-form-validator"></span>
+              </td>
+            </tr>
+            <tr>
+              <th class="oc-form-label" scope="row">
+		<label for="password">
+		  {% blocktrans %}Password{% endblocktrans %}
+		</label>
+              </th>
+              <td class="oc-form-value">
+		<input type="password" size="15" 
+		       name="password" id="password" />
+	      </td>
+              <td class="oc-form-help"> 
+	      </td>
+            </tr>
+            <tr class="oc-options">
+              <th></th>
+              <td class="oc-form-value oc-form-fieldBlock oc-smallText">
+		<input class="oc-input-typeCheck" type="checkbox"
+		       name="no_expire_cookie" id="no_expire_cookie" /> 
+		<label for="no_expire_cookie">
+		  {% blocktrans %}Keep me logged in{% endblocktrans %}
+		</label>
+              </td>
+              <td class="oc-form-help">
+              </td>
+            </tr>
+            <tr class="oc-actions">
+              <th></th>
+              <td class="oc-form-value">
+		<input class="context oc-button oc-chooseThis" type="submit" name="login" 
+		       value="{% blocktrans %}Sign in{% endblocktrans %}" />
+          </tbody>
+	</table>
+      </fieldset>
+    </form>
+    
+    <div class="oc-js-expander oc-expander">
+      <h2 class="oc-bigText">
+	<a class="oc-js-expander_open oc-expanderLink" href="{% url 'forgot' %}">
+	  {% blocktrans %}Forgot your username or password?{% endblocktrans %}
+	</a>
+      </h2>
+      <form class="oc-js-expander-content oc-expander-content" method="POST"
+	    name="forgot_form" action="{% url 'forgot' %}"
+	    style="position: static; visibility: visible; 
+		   display: none; left: auto; top: auto; z-index: auto;">
+	{% csrf_token %}
+	<p class="oc-headingContext">
+	  {% blocktrans %}Enter your username or email address to retrieve your login information.{% endblocktrans %}
+	</p>
+	<table class="oc-form" cellpadding="0" cellspacing="0">
+          <thead></thead>
+          <tbody>
+            <tr>
+              <th class="oc-form-label" scope="row">
+		<label for="username">
+		  {% blocktrans %}Username or email address{% endblocktrans %}
+		</label>
+              </th>
+              <td class="oc-form-value">
+		<input type="text" size="15" tabindex="0" 
+		       name="username" value="" id="username">
+              </td>
+              <td class="oc-form-help">
+		<span class="oc-form-context"></span>
+		<span id="oc-validator-username" class="oc-form-validator"></span>
+              </td>
+            </tr>
+            <tr class="oc-actions">
+              <th></th>
+              <td>
+		<button class="oc-button" type="submit" 
+			name="send:boolean" value="True">
+		  {% blocktrans %}Send{% endblocktrans %}
+		</button>
+	      </td>
+              <td class="oc-form-help"></td>
+            </tr>                    
+          </tbody>
+	</table>
+      </form>
+    </div>
+  </div>
+  <div id="oc-content-sidebar">
+    <div class="oc-getstarted">
+      <h2>{% blocktrans %}New users{% endblocktrans %}</h2>
+      <p>
+	{% blocktrans %}Whether your group is mobilizing voters, planning a protest, or growing a garden, OpenFSM can help you become more effective.{% endblocktrans %}
+      </p>
+      <a href="{% url 'join' %}" class="oc-banana">
+	{% blocktrans %}Join {{ SITE_NAME }}{% endblocktrans %}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

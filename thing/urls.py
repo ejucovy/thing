@@ -82,7 +82,7 @@ urlpatterns += patterns(
         'registration_workflow.views.register',
         name='join'),
 
-#    url(r'^forgot/$', 'forgot'),
+    url(r'^forgot/$', 'forgot', name='forgot'),
 
     (r'^accounts/contact/', include('contact_manager.urls')),
     (r'^accounts/', include('registration_workflow.urls')),
