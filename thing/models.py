@@ -50,6 +50,14 @@ class Project(models.Model):
     def theme_url(self):
         return ('projects_project_theme', [self.slug])
 
+    @models.permalink
+    def manage_team_url(self):
+        return ('projects_project_manage_team', [self.slug])
+
+    @models.permalink
+    def preferences_url(self):
+        return ('projects_project_preferences', [self.slug])
+
     def logo_url(self):
         if self.logo:
             return self.logo
@@ -90,6 +98,15 @@ class Project(models.Model):
             nav.append((tool.relative_path(), _(tool.title)))
         return nav
 
+    def nav_management_entries(self):
+        nav = [
+            (self.manage_team_url(), _("Team")),
+            (self.preferences_url(), _("Preferences")),
+            ]
+        #for tool in self.tools.all():
+        #    nav.append((tool.
+        return nav
+
     def dispatch(self, path_info):
         """
         @@TODO unit test this!
@@ -116,22 +133,20 @@ class Project(models.Model):
         lives exclusively at "/" (not /index.php)?
         """
         path_info = path_info.lstrip("/")
-        if '/' in path_info.strip("/"):
-            app, path_info = path_info.split("/", 1)
+
+        if '/' in path_info:
+            app, path = path_info.split("/", 1)
         else:
-            app = '/'
-        path_info = path_info.lstrip("/")
-        if '/' in path_info.strip("/"):
-            env, path_info = path_info.split("/", 1)
-        else:
-            env = '/'
+            app = path_info
+            path = '/'
         try:
-            return ProjectTool.objects.get(project=self, app=app, env=env).bound(path_info)
+            return ProjectTool.objects.get(project=self, app=app).bound(path)
         except ProjectTool.DoesNotExist:
-            try:
-                return ProjectTool.objects.get(project=self, app=app, env=path_info.strip("/")).bound("/")
-            except ProjectTool.DoesNotExist:
-                return None
+            pass
+        try:
+            return ProjectTool.objects.get(project=self, app='/').bound(path_info)
+        except ProjectTool.DoesNotExist:
+            return None
 
 class ProjectFeedSource(models.Model):
     
@@ -200,15 +215,14 @@ class ProjectTool(models.Model):
     class Meta:
         verbose_name = _('project tool')
         verbose_name_plural = _('project tools')
-        unique_together = [('project', 'app', 'env')]
+        unique_together = [('project', 'app')]
     
     project = models.ForeignKey(Project, verbose_name=_('project'),
                                 related_name="tools")
 
-    app = models.CharField(_('app path'), max_length=20)
-    env = models.CharField(_('app env'), max_length=20)
+    app = models.CharField(_('app path'), max_length=50)
 
-    homepage = models.CharField(_('app homepage'), max_length=50)
+    homepage = models.CharField(_('app homepage'), max_length=150)
 
     title = models.CharField(_('app title'), max_length=30)
     
@@ -217,14 +231,14 @@ class ProjectTool(models.Model):
     url = models.CharField(_('app url'), max_length=200)
 
     def bound(self, path_info):
-        self.script_name = self.project.homepage_url().rstrip("/") + "/%s/%s/" % (
-            self.app.strip("/"), self.env.strip("/"))
+        self.script_name = self.project.homepage_url().rstrip("/") + "/%s/" % (
+            self.app.strip("/"))
         self.path_info = path_info
         return self
 
     def relative_path(self):
         path = "/".join((
-                self.app.strip("/"), self.env.strip("/"), self.homepage.strip("/")))
+                self.app.strip("/"), self.homepage.strip("/")))
         return "%s%s" % (self.project.homepage_url(),
                          path.strip("/"))
 

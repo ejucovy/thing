@@ -177,6 +177,16 @@ def projects_project(request, slug):
 def projects_project_theme(request, slug):
     return theme(request)
 
+@allow_http("GET")
+@project_view
+def projects_project_manage_team(request, slug):
+    return theme(request)
+
+@allow_http("GET")
+@project_view
+def projects_project_preferences(request, slug):
+    return theme(request)
+
 from libopencore.deliverance_middleware import CustomDeliveranceMiddleware
 
 class UseProxy(Exception):

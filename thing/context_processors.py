@@ -34,15 +34,13 @@ def thing_chrome(request):
             is_admin = False
         if is_admin:
             chrome['request_context']['nav_action_entries'] = [
-                ("manage", "Manage", [
-                        ("preferences", "Preferences"),
-                        ("team", "Team"),
-                        ("tools", "Tools"),
-                        ]),
+                ("manage", _("Manage"), 
+                 request.project.nav_management_entries()
+                 ),
                 ]
         else:
             chrome['request_context']['nav_action_entries'] = [
-                ("request-membership", "Join Project"),
+                ("request-membership", _("Join Project")),
                 ]
     else:
         chrome['request_context'] = {

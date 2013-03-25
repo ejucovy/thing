@@ -45,8 +45,10 @@ urlpatterns = patterns(
     url(r'^projects/(?P<slug>[\d\w\-_]+)/team/$', 'projects_project_team',
         name="projects_project_team"), #check
 
-#    url(r'^projects/(?P<slug>[\d\w\-_]+)/manage-team/$', 'projects_project_manage_team'),
-#    url(r'^projects/(?P<slug>[\d\w\-_]+)/preferences/$', 'projects_project_preferences'),
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/manage-team/$', 'projects_project_manage_team',
+        name="projects_project_manage_team"),
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/preferences/$', 'projects_project_preferences',
+        name="projects_project_preferences"),
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/export/$', 'projects_project_export'),
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/delete/$', 'projects_project_delete'),
 
