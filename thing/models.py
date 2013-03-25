@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from zope.dottedname.resolve import resolve
 
 class Project(models.Model):
 
@@ -94,17 +96,29 @@ class Project(models.Model):
             (self.summary_url(), _("Summary")),
             (self.team_url(), _("Team")),
             ]
-        for tool in self.tools.all():
-            nav.append((tool.relative_path(), _(tool.title)))
+        for tool in self.project_tools():
+            tool_nav = tool.nav_entries()
+            if tool_nav:
+                nav.extend(tool_nav)
         return nav
+
+    def project_tools(self):
+        tools = list(self.tools.all())
+        for tool_provider in settings.THING_TOOL_PROVIDERS:
+            tool_provider = resolve(tool_provider)
+            tool_provider = tool_provider(self)
+            tools.insert(0, tool_provider)
+        return tools
 
     def nav_management_entries(self):
         nav = [
             (self.manage_team_url(), _("Team")),
             (self.preferences_url(), _("Preferences")),
             ]
-        #for tool in self.tools.all():
-        #    nav.append((tool.
+        for tool in self.project_tools():
+            tool_nav = tool.nav_management_entries()
+            if tool_nav:
+                nav.extend(tool_nav)
         return nav
 
     def dispatch(self, path_info):
@@ -132,19 +146,15 @@ class Project(models.Model):
         Also how to handle proxying to a downstream site whose root 
         lives exclusively at "/" (not /index.php)?
         """
-        path_info = path_info.lstrip("/")
 
-        if '/' in path_info:
-            app, path = path_info.split("/", 1)
-        else:
-            app = path_info
-            path = '/'
+        for tool in self.project_tools():
+            new_path = tool.match_request(path_info)
+            if new_path is not None:
+                return tool.bind_request(new_path)
+
+        # Fallback tool
         try:
-            return ProjectTool.objects.get(project=self, app=app).bound(path)
-        except ProjectTool.DoesNotExist:
-            pass
-        try:
-            return ProjectTool.objects.get(project=self, app='/').bound(path_info)
+            return ProjectTool.objects.get(project=self, app='/').bind_request(path_info)
         except ProjectTool.DoesNotExist:
             return None
 
@@ -230,7 +240,18 @@ class ProjectTool(models.Model):
 
     url = models.CharField(_('app url'), max_length=200)
 
-    def bound(self, path_info):
+    def match_request(self, path_info):
+        path_info = path_info.lstrip("/")
+
+        if '/' in path_info:
+            app, path = path_info.split("/", 1)
+        else:
+            app = path_info
+            path = '/'
+        if self.app == app:
+            return path
+        
+    def bind_request(self, path_info):
         self.script_name = self.project.homepage_url().rstrip("/") + "/%s/" % (
             self.app.strip("/"))
         self.path_info = path_info
@@ -241,6 +262,14 @@ class ProjectTool(models.Model):
                 self.app.strip("/"), self.homepage.strip("/")))
         return "%s%s" % (self.project.homepage_url(),
                          path.strip("/"))
+
+    def nav_entries(self):
+        return [
+            (self.relative_path(), self.title),
+            ]
+
+    def nav_management_entries(self):
+        return None
 
 class ProjectMember(models.Model):
     

@@ -155,9 +155,15 @@ INSTALLED_APPS = (
     'contact_manager',
     'registration_workflow',
     'thing',
+    
+    'thing_sympa',
 )
 ACCOUNT_ACTIVATION_DAYS = 7
 LOGIN_REDIRECT_URL = "home"
+THING_SYMPA_BASE_URL = 'http://lists.occupy.net/lists/'
+THING_TOOL_PROVIDERS = [
+    'thing_sympa.tool.ToolProvider',
+    ]
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

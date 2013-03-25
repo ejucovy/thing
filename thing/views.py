@@ -205,9 +205,11 @@ def projects_project_dispatch(request, slug, path_info):
                 "base_url": tool.url,
                 "script_name": tool.script_name,
                 "path_info": tool.path_info,
-                "theme": request.project.theme_url(),
                 "deliverance_rules": tool.deliverance_rules,
+
+                "theme": request.project.theme_url(),
                 "project": request.project.to_json(),
+
                 "user": request.user.username,
                 "cookie_blacklist": [
                     "__ac",
