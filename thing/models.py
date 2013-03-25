@@ -274,6 +274,9 @@ class ProjectMember(models.Model):
         if self.role == "admin":
             return "ProjectAdmin"
 
+    def is_admin(self):
+        return self.role == "admin"
+
     anonymous = models.BooleanField(default=False, verbose_name=_('project member anonymous flag'))
     pseudonym = models.CharField(max_length=300, null=True, blank=True, unique=True)
 

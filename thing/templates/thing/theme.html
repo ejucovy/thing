@@ -41,12 +41,28 @@
 	    <a href="{{ request_context.url }}">{{ request_context.title }}</a>
 	  </h1>
 	  
-	  <ul id="oc-topnav-context" class="oc-clearAfter">
+	  <ul id="oc-topnav-context" class="oc-clearAfter oc-dropdown-list">
 	    {% for nav_entry in request_context.nav_entries %}
 	    <li>
 	      <a href="{{ nav_entry.0 }}">{{ nav_entry.1 }}</a>
 	    </li>
 	    {% endfor %}
+	    {% if request_context.nav_action_entries %}
+	    {% for nav_entry in request_context.nav_action_entries %}
+	    {% with subnav=nav_entry.2 %}
+	    <li class="oc-topnav-join{% if subnav %} oc-dropdown-container{% endif %}">
+	      <a href="{{ nav_entry.0 }}">{{ nav_entry.1 }}</a>
+	      {% if subnav %}
+	      <ul style="display:none">
+		{% for subentry in subnav %}
+		<li><a href="{{ subentry.0 }}">{{ subentry.1 }}</a></li>
+		{% endfor %}
+	      </ul>
+	      {% endif %}
+	    </li>
+	    {% endwith %}
+	    {% endfor %}
+	    {% endif %}
 	  </ul>
 
 	  <div id="oc-topnav-tab">
