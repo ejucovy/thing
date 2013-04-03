@@ -197,16 +197,17 @@ class UseProxy(Exception):
 @csrf_exempt
 @project_view
 def projects_project_dispatch(request, slug, path_info):
-    proxy = request.project.dispatch(path_info)
-    if proxy is None:
+    tool = request.project.dispatch(path_info)
+    if tool is None:
         return HttpResponse("404") # @@todo
-    tool = proxy.get_tool()
+
+    data = tool.request_data(tool.path_info)
 
     return HttpResponse(json.dumps({
-                "base_url": tool.url,
+                "base_url": data['url'],
                 "script_name": tool.script_name,
                 "path_info": tool.path_info,
-                "deliverance_rules": tool.deliverance_rules,
+                "deliverance_rules": data['deliverance_rules'],
 
                 "theme": request.project.theme_url(),
                 "project": request.project.to_json(),

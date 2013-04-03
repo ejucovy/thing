@@ -103,6 +103,7 @@ class Project(models.Model):
         return nav
 
     def project_tools(self):
+        return []
         tools = list(self.tools.all())
         for tool_provider in settings.THING_TOOL_PROVIDERS:
             tool_provider = resolve(tool_provider)
@@ -148,14 +149,23 @@ class Project(models.Model):
         """
 
         components = path_info.strip("/").split("/")
-        # @@TODO this will never be more than like 10. just fetch em all and iterate.
+
+        tools = self.tools.all()
+        paths = {}
+        for tool in tools:
+            tool = tool.get_tool()
+            for path in tool.proxy_paths():
+                paths[path] = tool
+
+        remaining = []
         while components:
             prefix = '/'.join([''] + components + [''])
-            try:
-                return self.proxies.get(path_prefix=prefix)
-            except ProjectProxy.DoesNotExist:
-                pass
-            components.pop(-1)
+            if prefix in paths:
+                tool = paths[prefix]
+                tool.script_name = self.homepage_url().rstrip("/") + "/" + prefix.lstrip("/")
+                tool.path_info = '/'.join([''] + remaining + [''])
+                return tool
+            remaining.insert(0, components.pop(-1))
         return None
 
 class ProjectFeedSource(models.Model):
@@ -219,21 +229,18 @@ class ProjectNavigationEntry(models.Model):
     title = models.CharField('title', max_length=255)
     url = models.CharField('url', max_length=255)
 
-
-class ProjectProxy(models.Model):
+        
+class ProjectInstalledTool(models.Model):
 
     class Meta:
-        verbose_name = _('project proxy')
-        verbose_name_plural = _('project proxies')
-        unique_together = [('project', 'path_prefix')]
+        verbose_name = _('project tool')
+        verbose_name_plural = _('project tools')
 
     project = models.ForeignKey(Project, verbose_name=_('project'),
-                                related_name="proxies")
-    path_prefix = models.CharField(_('project proxy path prefix'), 
-                                   max_length=50, db_index=True)
-    tool_dottedname = models.CharField(_('project proxy tool dotted name'),
+                                related_name="tools")
+    tool_dottedname = models.CharField(_('project tool dotted name'),
                                        max_length=50)
-    configuration = models.TextField(_('project proxy configuration'),
+    configuration = models.TextField(_('project tool configuration'),
                                      null=True, blank=True)
 
     def get_tool(self):
@@ -247,7 +254,7 @@ class ProjectTool(models.Model):
         unique_together = [('project', 'app')]
     
     project = models.ForeignKey(Project, verbose_name=_('project'),
-                                related_name="tools")
+                                related_name="toolss")
 
     app = models.CharField(_('app path'), max_length=50)
 

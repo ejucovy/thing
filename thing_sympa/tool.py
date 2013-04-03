@@ -10,9 +10,8 @@ class ToolProvider(object):
 <ruleset>
   <rule class="default">
     <drop content="div#Menus .MenuBlock:first-child" />
-    <drop content="div#Menus" />
     <replace theme="children://div[@id='oc-content-container']"
-                   content="div#Menus" collapse-sources="1" />
+             content="div#Menus" collapse-sources="1" />
     <append theme="children://div[@id='oc-content-container']"
              content="//div[@id='Stretcher']"
              collapse-sources="1"
@@ -22,13 +21,13 @@ class ToolProvider(object):
 </ruleset>
 """
 
-    def __init__(self, project):
-        self._project = project
+    def __init__(self, project_tool):
+        self._project = project = project_tool.project
         try:
             self._tool = ProjectSympaTool.objects.get(project=project)
         except ProjectSympaTool.DoesNotExist:
             self._tool = None
-        
+
     def nav_entries(self):
         if self._tool is None:
             return None
@@ -40,18 +39,11 @@ class ToolProvider(object):
     def nav_management_entries(self):
         return None
     
-    def match_request(self, path_info):
-        if self._tool is None:
-            return None
-        path_info = path_info.lstrip("/").split("/")
-        if path_info[0] == self._SYMPA_TOOL_PATH:
-            return '/'.join(path_info[1:])
+    def proxy_paths(self):
+        return ['/%s/' % self._SYMPA_TOOL_PATH]
 
-    def bind_request(self, path_info):
-        self.script_name = self._project.homepage_url().rstrip("/") + "/%s/" % (
-            self._SYMPA_TOOL_PATH)
-        self.path_info = path_info
-        self.url = self._SYMPA_BASE_URL
-        self.deliverance_rules = self._DELIVERANCE_RULES
-        return self
+    def request_data(self, path_info):
+        return {'url': self._SYMPA_BASE_URL,
+                'deliverance_rules': self._DELIVERANCE_RULES}
+
 
