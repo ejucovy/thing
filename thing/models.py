@@ -148,13 +148,14 @@ class Project(models.Model):
         """
 
         components = path_info.strip("/").split("/")
+        # @@TODO this will never be more than like 10. just fetch em all and iterate.
         while components:
             prefix = '/'.join([''] + components + [''])
             try:
                 return self.proxies.get(path_prefix=prefix)
             except ProjectProxy.DoesNotExist:
                 pass
-            components = components.pop(-1)
+            components.pop(-1)
         return None
 
 class ProjectFeedSource(models.Model):
