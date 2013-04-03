@@ -197,10 +197,11 @@ class UseProxy(Exception):
 @csrf_exempt
 @project_view
 def projects_project_dispatch(request, slug, path_info):
-    tool = request.project.dispatch(path_info)
-    if tool is None:
+    proxy = request.project.dispatch(path_info)
+    if proxy is None:
         return HttpResponse("404") # @@todo
-    
+    tool = proxy.get_tool()
+
     return HttpResponse(json.dumps({
                 "base_url": tool.url,
                 "script_name": tool.script_name,

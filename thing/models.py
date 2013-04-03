@@ -147,16 +147,15 @@ class Project(models.Model):
         lives exclusively at "/" (not /index.php)?
         """
 
-        for tool in self.project_tools():
-            new_path = tool.match_request(path_info)
-            if new_path is not None:
-                return tool.bind_request(new_path)
-
-        # Fallback tool
-        try:
-            return ProjectTool.objects.get(project=self, app='/').bind_request(path_info)
-        except ProjectTool.DoesNotExist:
-            return None
+        components = path_info.strip("/").split("/")
+        while components:
+            prefix = '/'.join([''] + components + [''])
+            try:
+                return self.proxies.get(path_prefix=prefix)
+            except ProjectProxy.DoesNotExist:
+                pass
+            components = components.pop(-1)
+        return None
 
 class ProjectFeedSource(models.Model):
     
@@ -219,7 +218,26 @@ class ProjectNavigationEntry(models.Model):
     title = models.CharField('title', max_length=255)
     url = models.CharField('url', max_length=255)
 
-    
+
+class ProjectProxy(models.Model):
+
+    class Meta:
+        verbose_name = _('project proxy')
+        verbose_name_plural = _('project proxies')
+        unique_together = [('project', 'path_prefix')]
+
+    project = models.ForeignKey(Project, verbose_name=_('project'),
+                                related_name="proxies")
+    path_prefix = models.CharField(_('project proxy path prefix'), 
+                                   max_length=50, db_index=True)
+    tool_dottedname = models.CharField(_('project proxy tool dotted name'),
+                                       max_length=50)
+    configuration = models.TextField(_('project proxy configuration'),
+                                     null=True, blank=True)
+
+    def get_tool(self):
+        return resolve(self.tool_dottedname)(self)
+
 class ProjectTool(models.Model):
     
     class Meta:
