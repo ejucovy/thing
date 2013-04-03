@@ -27,6 +27,7 @@ class ToolProvider(object):
             self._tool = ProjectSympaTool.objects.get(project=project)
         except ProjectSympaTool.DoesNotExist:
             self._tool = None
+        self.urlconf = 'thing_sympa.urls'
 
     def nav_entries(self):
         if self._tool is None:

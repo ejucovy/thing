@@ -162,6 +162,7 @@ def project_view(view):
         request.project = project
         request.member = member
         return view(request, slug, *args, **kw)
+    inner.__name__ = view.__name__
     return inner
 
 @allow_http("GET")
@@ -197,6 +198,13 @@ class UseProxy(Exception):
 @csrf_exempt
 @project_view
 def projects_project_dispatch(request, slug, path_info):
+    for t in request.project.tools.all():
+        t = t.get_tool()
+        from django.core.urlresolvers import resolve, Resolver404
+        view = resolve('/%s' % path_info.lstrip('/'), t.urlconf)
+        if not isinstance(view, Resolver404):
+            return view[0](request)
+
     tool = request.project.dispatch(path_info)
     if tool is None:
         return HttpResponse("404") # @@todo
