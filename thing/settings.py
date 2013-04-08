@@ -15,6 +15,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = "smtp.postmarkapp.com"
 EMAIL_HOST_USER = os.environ.get("THING_EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("THING_EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.environ.get("THING_DEFAULT_FROM_EMAIL")
 
 DATABASES = {
     'default': {
