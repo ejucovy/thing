@@ -149,7 +149,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
-    'registration',
+    #'registration',
     #'inactive_user_workflow',
 
     'contact_manager',
