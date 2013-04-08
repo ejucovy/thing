@@ -1,1 +1,1 @@
-web: gunicorn thin.wsgi
+web: gunicorn thing.wsgi
