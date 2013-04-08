@@ -127,6 +127,7 @@ def projects(request):
             })
     return chrome
 
+#@@TODO: POST to create project
 @allow_http("GET")
 @rendered_with("thing/projects_create.html")
 def projects_create(request):
