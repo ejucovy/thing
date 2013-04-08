@@ -9,7 +9,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+import os
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.postmarkapp.com"
+EMAIL_HOST_USER = os.environ.get("THING_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("THING_EMAIL_HOST_PASSWORD")
 
 DATABASES = {
     'default': {
@@ -38,7 +43,6 @@ LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
-import os
 SITE_NAME = os.environ.get("THING_SITE_NAME", "OpenFSM")
 SITE_DOMAIN = os.environ.get("THING_SITE_DOMAIN", "http://localhost:8000")
 import datetime
