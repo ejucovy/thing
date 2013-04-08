@@ -38,11 +38,12 @@ LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
-SITE_NAME = "OpenFSM"
-SITE_DOMAIN = "http://localhost:8000"
+import os
+SITE_NAME = os.environ.get("THING_SITE_NAME", "OpenFSM")
+SITE_DOMAIN = os.environ.get("THING_SITE_DOMAIN", "http://localhost:8000")
 import datetime
-SITE_BIRTHDATE = datetime.date(2012, 5, 1)
-OPENCORE_SECRET_FILENAME = "/Users/ethanjucovy/Code/socialplanning/thing/admin_info"
+SITE_BIRTHDATE = datetime.date(2013, 4, 1)
+OPENCORE_SECRET_FILENAME = os.environ.get("THING_OPENCORE_SECRET_FILENAME", "/Users/ethanjucovy/Code/socialplanning/thing/admin_info")
 SESSION_COOKIE_NAME = "openfsm.sessionid"
 CSRF_COOKIE_NAME = "openfsm.csrftoken"
 
