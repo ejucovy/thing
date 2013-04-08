@@ -103,13 +103,8 @@ class Project(models.Model):
         return nav
 
     def project_tools(self):
-        return []
         tools = list(self.tools.all())
-        for tool_provider in settings.THING_TOOL_PROVIDERS:
-            tool_provider = resolve(tool_provider)
-            tool_provider = tool_provider(self)
-            tools.insert(0, tool_provider)
-        return tools
+        return [tool.get_tool() for tool in tools]
 
     def nav_management_entries(self):
         nav = [
@@ -148,7 +143,7 @@ class Project(models.Model):
         lives exclusively at "/" (not /index.php)?
         """
 
-        components = path_info.strip("/").split("/")
+        components = path_info.lstrip("/").split("/")
 
         tools = self.tools.all()
         paths = {}
@@ -159,11 +154,13 @@ class Project(models.Model):
 
         remaining = []
         while components:
-            prefix = '/'.join([''] + components + [''])
+            prefix = '/'.join([''] + components)
+            print prefix
             if prefix in paths:
                 tool = paths[prefix]
-                tool.script_name = self.homepage_url().rstrip("/") + "/" + prefix.lstrip("/")
-                tool.path_info = '/'.join([''] + remaining + [''])
+                tool.consume_request(self.homepage_url().rstrip("/") + "/",
+                                     prefix.lstrip("/"),
+                                     '/'.join([''] + remaining))
                 return tool
             remaining.insert(0, components.pop(-1))
         return None

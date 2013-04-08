@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from thing.models import Project
 
 class ProjectSympaTool(models.Model):
-    project = models.ForeignKey(Project, verbose_name=_("project"), unique=True)
+    project = models.ForeignKey(Project, verbose_name=_("project"))
 
     list_path = models.CharField(_('sympa list path'), max_length=80)
     list_name = models.CharField(_('sympa list name'), max_length=200)

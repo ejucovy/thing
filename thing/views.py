@@ -202,7 +202,10 @@ def projects_project_dispatch(request, slug, path_info):
     for t in request.project.tools.all():
         t = t.get_tool()
         from django.core.urlresolvers import resolve, Resolver404
-        view = resolve('/%s' % path_info.lstrip('/'), t.urlconf)
+        try:
+            view = resolve('/%s' % path_info.lstrip('/'), t.urlconf)
+        except Resolver404:
+            continue
         if not isinstance(view, Resolver404):
             return view[0](request)
 

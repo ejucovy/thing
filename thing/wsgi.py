@@ -57,7 +57,7 @@ def middleware(environ, start_response):
         return response(environ, start_response)
     data = json.loads(response.body)
 
-    proxy = RemoteProxy([data['base_url']], rewrite_links=True, rewrite_cookies=True)
+    proxy = RemoteProxy([data['base_url']], rewrite_links=True)
 
     request.environ.pop("HTTP_ACCEPT_ENCODING", None)
 
