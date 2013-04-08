@@ -122,7 +122,7 @@ MIDDLEWARE_CLASSES = (
     'thing.middleware.AuthenticationMiddleware',
 )
 
-INACTIVE_PATHS = ('/accounts/', '/static/')
+INACTIVE_PATHS = ('/accounts/', '/static/', '/logout/')
 
 ROOT_URLCONF = 'thing.urls'
 
