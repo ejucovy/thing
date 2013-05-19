@@ -162,6 +162,7 @@ INSTALLED_APPS = (
     'registration_workflow',
     'thing',
     
+    'thing_gitwiki',
     'thing_sympa',
 )
 ACCOUNT_ACTIVATION_DAYS = 7
@@ -169,6 +170,7 @@ LOGIN_REDIRECT_URL = "home"
 THING_SYMPA_BASE_URL = 'http://lists.occupy.net/lists/'
 THING_TOOL_PROVIDERS = [
     'thing_sympa.tool.ToolProvider',
+    'thing_gitwiki.tool.ToolProvider',
     ]
 
 # A sample logging configuration. The only tangible logging

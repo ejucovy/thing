@@ -58,8 +58,12 @@ urlpatterns = patterns(
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/request-membership/$', 'projects_project_request_membership'),
 #    url(r'^projects/(?P<slug>[\d\w\-_]+)/invite/$', 'projects_project_invite'),
 
+    url(r'^projects/(?P<slug>[\d\w\-_]+)/create_tool/$',
+        'projects_project_create_tool'),
+
     url(r'^projects/(?P<slug>[\d\w\-_]+)/(?P<path_info>.*)$',
         'projects_project_dispatch'),
+
 
 #    url(r'^search/$', 'search'),
 #    url(r'^search/people/$', 'search_people'),

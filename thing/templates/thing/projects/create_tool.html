@@ -1,0 +1,22 @@
+{% extends "thing/theme.html" %}
+{% load i18n %}
+{% block content %}
+
+<div>
+  <div id="oc-content-main">
+    <div class="oc-headingBlock">
+      <h1>{% blocktrans %}Create new list{% endblocktrans %}</h1>
+    </div>
+    <div>
+      <form method="POST">
+	{% csrf_token %}
+	{{ form.as_p }}
+
+	<input type="submit" />
+      </form>
+    </div>
+  <div id="oc-content-sidebar">
+  </div>
+</div>
+
+{% endblock %}

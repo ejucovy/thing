@@ -202,6 +202,8 @@ def projects_project_dispatch(request, slug, path_info):
     for t in request.project.tools.all():
         t = t.get_tool()
         from django.core.urlresolvers import resolve, Resolver404
+        if not hasattr(t, 'urlconf'):
+            continue
         try:
             view = resolve('/%s' % path_info.lstrip('/'), t.urlconf)
         except Resolver404:
@@ -231,6 +233,59 @@ def projects_project_dispatch(request, slug, path_info):
                     settings.CSRF_COOKIE_NAME,
                     ],
                 }, default=dthandler), status=305)
+
+
+from thing.models import ProjectInstalledTool
+from thing.forms import ProjectToolForm
+import requests
+@allow_http("GET", "POST")
+@project_view
+@rendered_with("thing/projects/create_tool.html")
+def projects_project_create_tool(request, slug):
+    if request.method == "GET":
+        form = ProjectToolForm()
+        return {'form': form}
+
+    form = ProjectToolForm(data=request.POST)
+    if not form.is_valid():
+        return {'form': form}
+
+    member_permissions = set()
+    other_permissions = set()
+    for permission in form.PERMISSION_CHOICES[1:]:
+        member_permissions.add(form.PERMISSION_MAP[permission[0]])
+        if permission[0] == form.cleaned_data['member_level']:
+            break
+    for permission in form.PERMISSION_CHOICES[1:]:
+        other_permissions.add(form.PERMISSION_MAP[permission[0]])
+        if permission[0] == form.cleaned_data['other_level']:
+            break
+
+    project_parts = []
+    i = 0
+    while i <= len(request.project.slug):
+        project_parts.append(request.project.slug[i:i+10])
+        i += 10
+
+    data = json.dumps({
+            'roles': {
+                'ProjectMember': list(member_permissions),
+                'Authenticated': list(other_permissions),
+                },
+            'wiki': '/tmp/%s/%s/' % ('/'.join(project_parts), form.cleaned_data['slug']),
+            })
+    try:
+        resp = requests.post('http://localhost:8080/_create/',
+                             data=data, headers={'Content-Type': "application/json"})
+    except Exception, e:
+        return HttpResponse("didn't work: " + str(e))
+    tool = ProjectInstalledTool(project=request.project, 
+                                tool_dottedname='thing_gitwiki.tool.ToolProvider',
+                                configuration=json.dumps(dict(slug=form.cleaned_data['slug'],
+                                                              title=form.cleaned_data['name'])
+                                                         ))
+    tool.save()
+    return redirect("..")
 
 @allow_http("GET")
 @project_view
